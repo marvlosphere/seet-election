@@ -58,7 +58,13 @@ export default function AdminPage() {
     } catch { /* silent */ }
   }, [adminKey])
 
-  useEffect(() => { if (authed) fetchData() }, [authed, fetchData])
+  useEffect(() => {
+  if (authed && adminKey) {
+    fetchData()
+    const interval = setInterval(fetchData, 30000)
+    return () => clearInterval(interval)
+  }
+}, [authed, adminKey, fetchData])
 
   async function handleAdminAuth(e: React.FormEvent) {
     e.preventDefault()
@@ -204,7 +210,7 @@ export default function AdminPage() {
                 <button onClick={toggleElection} className={electionOpen ? 'btn-danger' : 'btn-primary'}>
                   {electionOpen ? 'Close Election' : 'Open Election'}
                 </button>
-                <button onClick={fetchData} className="btn-primary bg-gray-600 hover:bg-gray-700">
+                <button onClick={() => fetchData()} className="btn-primary bg-gray-600 hover:bg-gray-700">
                   Refresh Data
                 </button>
               </div>
