@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
   if (!votes || votes.length === 0) return NextResponse.json([])
 
-  const candidateIds = [...new Set(votes.map(v => v.candidate_id))]
+  const candidateIds = Array.from(new Set(votes.map(v => v.candidate_id)))
   const { data: candidates } = await db
     .from('candidates')
     .select('id, name')
