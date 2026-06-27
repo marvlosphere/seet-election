@@ -163,18 +163,19 @@ export default function AdminPage() {
             <h2 className="text-xl font-bold text-dark mb-6">Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <div className="card text-center">
-                <p className="text-3xl font-bold text-primary">{stats?.total_voters ?? '—'}</p>
+                <p className="text-3xl font-bold text-primary">{voters.length || '—'}</p>
                 <p className="text-gray-500 text-sm mt-1">Registered Voters</p>
               </div>
               <div className="card text-center">
-                <p className="text-3xl font-bold text-success">{stats?.total_voted ?? '—'}</p>
+                <p className="text-3xl font-bold text-success">{voters.filter(v => v.has_voted).length || '—'}</p>
                 <p className="text-gray-500 text-sm mt-1">Have Voted</p>
               </div>
               <div className="card text-center">
                 <p className="text-3xl font-bold text-accent">
-                  {stats?.total_voters ? Math.round((stats.total_voted / stats.total_voters) * 100) : 0}%
+                  {voters.length ? Math.round((voters.filter(v => v.has_voted).length / voters.length) * 100) : 0}%
                 </p>
                 <p className="text-gray-500 text-sm mt-1">Voter Turnout</p>
+              </div>
               </div>
             </div>
             <div className="card">
