@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { POSITIONS, Position } from '@/lib/supabase'
 
-interface Stats { total_voters: number; total_voted: number; tokens_sent: number }
 interface ResultRow { candidate_id: string; candidate_name: string; position: Position; vote_count: number }
 interface Voter { id: string; matric_number: string; full_name: string; department: string; level: string; phone: string; has_voted: boolean; token_used: boolean; token: string }
 
@@ -12,7 +11,6 @@ export default function AdminPage() {
   const [adminKey, setAdminKey] = useState('')
   const [authError, setAuthError] = useState('')
   const [tab, setTab] = useState<'dashboard' | 'voters' | 'results' | 'settings'>('dashboard')
-  const [stats, setStats] = useState<Stats | null>(null)
   const [results, setResults] = useState<ResultRow[]>([])
   const [voters, setVoters] = useState<Voter[]>([])
   const [electionOpen, setElectionOpen] = useState(false)
@@ -25,16 +23,14 @@ export default function AdminPage() {
   async function fetchData() {
     const k = keyRef.current
     if (!k) return
-    const t = Date.now()
     try {
       const h = { 'x-admin-key': k }
-      const [s, r, v, st] = await Promise.all([
-        fetch(`/api/admin/stats?t=${t}`, { headers: h }),
+      const t = Date.now()
+      const [r, v, st] = await Promise.all([
         fetch(`/api/admin/results?t=${t}`, { headers: h }),
         fetch(`/api/admin/voters?t=${t}`, { headers: h }),
         fetch(`/api/admin/settings?t=${t}`, { headers: h }),
       ])
-      if (s.ok) setStats(await s.json())
       if (r.ok) setResults(await r.json())
       if (v.ok) setVoters(await v.json())
       if (st.ok) { const d = await st.json(); setElectionOpen(d.election_open) }
@@ -94,6 +90,10 @@ export default function AdminPage() {
     if (res.ok) setUploadStatus(`✅ Tokens sent to ${data.sent} voters via SMS`)
     else setUploadStatus(`❌ ${data.error}`)
   }
+
+  const totalVoters = voters.length
+  const totalVoted = voters.filter(v => v.has_voted).length
+  const turnout = totalVoters ? Math.round((totalVoted / totalVoters) * 100) : 0
 
   const resultsByPosition = POSITIONS.map(position => ({
     position,
@@ -163,20 +163,17 @@ export default function AdminPage() {
             <h2 className="text-xl font-bold text-dark mb-6">Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <div className="card text-center">
-                <p className="text-3xl font-bold text-primary">{voters.length || '—'}</p>
+                <p className="text-3xl font-bold text-primary">{totalVoters || '—'}</p>
                 <p className="text-gray-500 text-sm mt-1">Registered Voters</p>
               </div>
               <div className="card text-center">
-                <p className="text-3xl font-bold text-success">{voters.filter(v => v.has_voted).length || '—'}</p>
+                <p className="text-3xl font-bold text-success">{totalVoted || '—'}</p>
                 <p className="text-gray-500 text-sm mt-1">Have Voted</p>
               </div>
               <div className="card text-center">
-                <p className="text-3xl font-bold text-accent">
-                  {voters.length ? Math.round((voters.filter(v => v.has_voted).length / voters.length) * 100) : 0}%
-                </p>
+                <p className="text-3xl font-bold text-accent">{turnout}%</p>
                 <p className="text-gray-500 text-sm mt-1">Voter Turnout</p>
               </div>
-            </div>
             </div>
             <div className="card">
               <h3 className="font-bold text-dark mb-2">Quick Actions</h3>
