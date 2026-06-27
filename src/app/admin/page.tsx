@@ -25,13 +25,14 @@ export default function AdminPage() {
   async function fetchData() {
     const k = keyRef.current
     if (!k) return
+    const t = Date.now()
     try {
       const h = { 'x-admin-key': k }
       const [s, r, v, st] = await Promise.all([
-        fetch('/api/admin/stats', { headers: h }),
-        fetch('/api/admin/results', { headers: h }),
-        fetch('/api/admin/voters', { headers: h }),
-        fetch('/api/admin/settings', { headers: h }),
+        fetch(`/api/admin/stats?t=${t}`, { headers: h }),
+        fetch(`/api/admin/results?t=${t}`, { headers: h }),
+        fetch(`/api/admin/voters?t=${t}`, { headers: h }),
+        fetch(`/api/admin/settings?t=${t}`, { headers: h }),
       ])
       if (s.ok) setStats(await s.json())
       if (r.ok) setResults(await r.json())
