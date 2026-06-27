@@ -42,21 +42,22 @@ export default function AdminPage() {
   const [uploadStatus, setUploadStatus] = useState('')
   const [sendingTokens, setSendingTokens] = useState(false)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (key?: string) => {
+  const authKey = key || adminKey
+  if (!authKey) return
   try {
-    if (!adminKey) return
     const [statsRes, resultsRes, votersRes, settingsRes] = await Promise.all([
-        fetch('/api/admin/stats', { headers: { 'x-admin-key': adminKey } }),
-        fetch('/api/admin/results', { headers: { 'x-admin-key': adminKey } }),
-        fetch('/api/admin/voters', { headers: { 'x-admin-key': adminKey } }),
-        fetch('/api/admin/settings', { headers: { 'x-admin-key': adminKey } }),
-      ])
-      if (statsRes.ok) setStats(await statsRes.json())
-      if (resultsRes.ok) setResults(await resultsRes.json())
-      if (votersRes.ok) setVoters(await votersRes.json())
-      if (settingsRes.ok) { const s = await settingsRes.json(); setElectionOpen(s.election_open) }
-    } catch { /* silent */ }
-  }, [adminKey])
+      fetch('/api/admin/stats', { headers: { 'x-admin-key': authKey } }),
+      fetch('/api/admin/results', { headers: { 'x-admin-key': authKey } }),
+      fetch('/api/admin/voters', { headers: { 'x-admin-key': authKey } }),
+      fetch('/api/admin/settings', { headers: { 'x-admin-key': authKey } }),
+    ])
+    if (statsRes.ok) setStats(await statsRes.json())
+    if (resultsRes.ok) setResults(await resultsRes.json())
+    if (votersRes.ok) setVoters(await votersRes.json())
+    if (settingsRes.ok) { const s = await settingsRes.json(); setElectionOpen(s.election_open) }
+  } catch { /* silent */ }
+}, [adminKey])
 
   useEffect(() => {
   if (authed && adminKey) {
@@ -67,17 +68,21 @@ export default function AdminPage() {
 }, [authed, adminKey, fetchData])
 
   async function handleAdminAuth(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    const res = await fetch('/api/admin/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: adminKey }),
-    })
-    setLoading(false)
-    if (res.ok) { setAuthed(true); setAuthError('') }
-    else setAuthError('Invalid admin key.')
+  e.preventDefault()
+  setLoading(true)
+  const res = await fetch('/api/admin/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key: adminKey }),
+  })
+  setLoading(false)
+  if (res.ok) {
+    setAuthed(true)
+    setAuthError('')
+    fetchData(adminKey)
   }
+  else setAuthError('Invalid admin key.')
+}
 
   async function toggleElection() {
     await fetch('/api/admin/settings', {
