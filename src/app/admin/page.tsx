@@ -316,7 +316,7 @@ export default function AdminPage() {
                 </td>
                 <td className="py-2">
                   
-                    href={waLink}
+                    <a href={waLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
