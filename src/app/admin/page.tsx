@@ -10,7 +10,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false)
   const [adminKey, setAdminKey] = useState('')
   const [authError, setAuthError] = useState('')
-  const [tab, setTab] = useState<'dashboard' | 'voters' | 'results' | 'settings'>('dashboard')
+  const [tab, setTab] = useState<'dashboard' | 'voters' | 'results' | 'whatsapp' | 'settings'>('dashboard')
   const [results, setResults] = useState<ResultRow[]>([])
   const [voters, setVoters] = useState<Voter[]>([])
   const [electionOpen, setElectionOpen] = useState(false)
@@ -147,7 +147,7 @@ export default function AdminPage() {
 
       <div className="bg-white border-b border-gray-200 px-6">
         <div className="flex gap-1">
-          {(['dashboard', 'voters', 'results', 'settings'] as const).map(t => (
+          {(['dashboard', 'voters', 'results', 'whatsapp', 'settings'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-3 text-sm font-medium capitalize border-b-2 transition-colors ${tab === t ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-dark'}`}>
               {t}
@@ -280,6 +280,64 @@ export default function AdminPage() {
           </div>
         )}
 
+        {tab === 'whatsapp' && (
+  <div>
+    <h2 className="text-xl font-bold text-dark mb-2">WhatsApp Token Distribution</h2>
+    <p className="text-gray-500 text-sm mb-6">
+      Click each button to open WhatsApp with the token pre-filled. Work through the list one by one.
+    </p>
+    <div className="card overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-gray-200 text-left">
+            <th className="pb-2 font-medium text-gray-500">Name</th>
+            <th className="pb-2 font-medium text-gray-500">Matric</th>
+            <th className="pb-2 font-medium text-gray-500">Token</th>
+            <th className="pb-2 font-medium text-gray-500">Status</th>
+            <th className="pb-2 font-medium text-gray-500">Action</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-50">
+          {voters.filter(v => !v.has_voted).map(voter => {
+            const phone = voter.phone.startsWith('+') ? voter.phone.replace('+', '') : '234' + voter.phone.slice(1)
+            const message = encodeURIComponent(
+              `Hello ${voter.full_name.split(' ')[0]}, your SEET Election voting token is: ${voter.token}\n\nMatric: ${voter.matric_number}\nVote at: seet-election.vercel.app/vote\n\nThis token is for one-time use only. Do not share it.`
+            )
+            const waLink = `https://wa.me/${phone}?text=${message}`
+            return (
+              <tr key={voter.id}>
+                <td className="py-2 font-medium">{voter.full_name}</td>
+                <td className="py-2 font-mono text-xs text-gray-500">{voter.matric_number}</td>
+                <td className="py-2 font-mono text-xs text-primary font-bold">{voter.token}</td>
+                <td className="py-2">
+                  {voter.has_voted
+                    ? <span className="badge bg-green-100 text-green-700">Voted</span>
+                    : <span className="badge bg-gray-100 text-gray-500">Pending</span>}
+                </td>
+                <td className="py-2">
+                  
+                    href={waLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    📱 Send
+                  </a>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+      {voters.filter(v => !v.has_voted).length === 0 && (
+        <p className="text-center text-gray-400 py-8">All voters have already voted!</p>
+      )}
+    </div>
+    <p className="text-gray-400 text-xs mt-4">
+      Showing {voters.filter(v => !v.has_voted).length} pending voters. Students who have already voted are hidden.
+    </p>
+  </div>
+)}
         {tab === 'settings' && (
           <div className="card max-w-lg">
             <h2 className="text-xl font-bold text-dark mb-6">Election Settings</h2>
