@@ -7,7 +7,7 @@ export default function HomePage() {
       <header className="px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center font-display font-bold text-dark text-sm">
-            NIMECHE FUTA CHAPTER
+            MEE
           </div>
           <span className="text-white font-semibold text-sm leading-tight">
             Mechanical<br />
