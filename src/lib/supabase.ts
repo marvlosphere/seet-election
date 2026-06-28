@@ -3,22 +3,28 @@
 export type Position =
   | 'President'
   | 'Vice President'
-  | 'Secretary General'
-  | 'Assistant Secretary General'
+  | 'General Secretary'
+  | 'Assistant General Secretary'
   | 'Financial Secretary'
-  | 'PRO'
-  | 'Director of Sports'
-  | 'Director of Social'
+  | 'PRO I'
+  | 'PRO II'
+  | 'Treasurer'
+  | 'Welfare Director'
+  | 'Sports Director'
+  | 'Social Director'
 
 export const POSITIONS: Position[] = [
   'President',
   'Vice President',
-  'Secretary General',
-  'Assistant Secretary General',
+  'General Secretary',
+  'Assistant General Secretary',
   'Financial Secretary',
-  'PRO',
-  'Director of Sports',
-  'Director of Social',
+  'PRO I',
+  'PRO II',
+  'Treasurer',
+  'Welfare Director',
+  'Sports Director',
+  'Social Director',
 ]
 
 export interface Candidate {
