@@ -1,12 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db'
+import { createClient } from '@supabase/supabase-js'
 import { isAdminAuthed } from '@/lib/adminAuth'
+
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET(req: NextRequest) {
   if (!isAdminAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const db = getDb()
-  await db.rpc('now')
-  const { data } = await db.from('voters').select('id, matric_number, full_name, department, level, phone, has_voted, token_used, token').order('full_name')
-  return NextResponse.json(data ?? [])
+
+  const db = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  const { data } = await db
+    .from('voters')
+    .select('id, matric_number, full_name, department, level, phone, has_voted, token_used, token')
+    .order('full_name')
+
+  return NextResponse.json(data ?? [], {
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    }
+  })
 }
