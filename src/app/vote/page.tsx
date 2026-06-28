@@ -93,7 +93,7 @@ export default function VotePage() {
       {/* Top bar */}
       <div className="bg-primary text-white px-6 py-4 flex items-center justify-between">
         <Link href="/" className="text-white/70 hover:text-white text-sm">← Back</Link>
-        <span className="font-semibold text-sm">SEET Student Elections</span>
+        <span className="font-semibold text-sm">NIMECHE Student Elections</span>
         <span className="text-white/40 text-xs">
           {step === 'auth' ? 'Step 1 of 3' : step === 'ballot' ? 'Step 2 of 3' : step === 'confirm' ? 'Step 3 of 3' : '✓'}
         </span>
