@@ -109,7 +109,7 @@ export default function AdminPage() {
               <span className="text-white text-xl">🔑</span>
             </div>
             <h1 className="text-xl font-bold text-dark">Admin Access</h1>
-            <p className="text-gray-500 text-sm mt-1">SEET Electoral Committee</p>
+            <p className="text-gray-500 text-sm mt-1">NIMECHE Electoral Committee</p>
           </div>
           <form onSubmit={handleAdminAuth} className="space-y-4">
             <input
@@ -134,7 +134,7 @@ export default function AdminPage() {
     <main className="min-h-screen bg-light">
       <div className="bg-primary text-white px-6 py-4 flex items-center justify-between">
         <div>
-          <p className="font-bold">SEET Admin Panel</p>
+          <p className="font-bold">NIMECHE Admin Panel</p>
           <p className="text-white/60 text-xs">Electoral Committee Dashboard</p>
         </div>
         <div className="flex items-center gap-3">
