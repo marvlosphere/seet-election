@@ -22,7 +22,12 @@ export async function POST(req: NextRequest) {
   if (!isAdminAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
     const db = getDb()
-    const { data: voters } = await db.from('voters').select('id, full_name, phone, token, matric_number').eq('token_used', false).eq('has_voted', false)
+    const url = new URL(req.url)
+    const dept_code = url.searchParams.get('dept_code')
+    
+    let query = db.from('voters').select('id, full_name, phone, token, matric_number, dept_code').eq('token_used', false).eq('has_voted', false)
+    if (dept_code) query = query.eq('dept_code', dept_code)
+    const { data: voters } = await query    
     if (!voters || voters.length === 0) return NextResponse.json({ sent: 0 })
     let sent = 0, failed = 0
     for (const voter of voters) {
