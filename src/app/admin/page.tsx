@@ -263,7 +263,6 @@ export default function AdminPage() {
                     <th className="pb-2 font-medium text-gray-500">Name</th>
                     <th className="pb-2 font-medium text-gray-500">Dept</th>
                     <th className="pb-2 font-medium text-gray-500">Phone</th>
-                    <th className="pb-2 font-medium text-gray-500">Token</th>
                     <th className="pb-2 font-medium text-gray-500">Status</th>
                   </tr>
                 </thead>
@@ -274,7 +273,6 @@ export default function AdminPage() {
                       <td className="py-2">{voter.full_name}</td>
                       <td className="py-2 text-gray-500 text-xs">{voter.department}</td>
                       <td className="py-2 text-gray-500 text-xs">{voter.phone}</td>
-                      <td className="py-2 font-mono text-xs text-primary">{voter.token}</td>
                       <td className="py-2">
                         {voter.has_voted
                           ? <span className="badge bg-green-100 text-green-700">Voted</span>
