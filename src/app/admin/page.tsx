@@ -38,13 +38,14 @@ export default function AdminPage() {
     try {
       const h = { 'x-admin-key': k }
       const t = Date.now()
-      const [r, v, st, a, sd] = await Promise.all([
-        fetch(`/api/admin/results?t=${t}`, { headers: h }),
-        fetch(`/api/admin/voters?t=${t}`, { headers: h }),
-        fetch(`/api/admin/settings?t=${t}`, { headers: h }),
-        fetch(`/api/admin/audit-log?t=${t}`, { headers: h }),
-        fetch(`/api/admin/schools-departments?t=${t}`, { headers: h }),
-      ])
+      const [r, v, st, a, sd, c] = await Promise.all([
+      fetch(`/api/admin/results?t=${t}`, { headers: h }),
+      fetch(`/api/admin/voters?t=${t}`, { headers: h }),
+      fetch(`/api/admin/settings?t=${t}`, { headers: h }),
+      fetch(`/api/admin/audit-log?t=${t}`, { headers: h }),
+      fetch(`/api/admin/schools-departments?t=${t}`, { headers: h }),
+      fetch(`/api/admin/candidates?t=${t}`, { headers: h }),
+    ])
       if (r.ok) setResults(await r.json())
       if (v.ok) setVoters(await v.json())
       if (st.ok) { const d = await st.json(); setElectionOpen(d.election_open) }
