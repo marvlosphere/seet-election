@@ -189,8 +189,11 @@ export default function AdminPage() {
                 <button onClick={toggleElection} className={electionOpen ? 'btn-danger' : 'btn-primary'}>
                   {electionOpen ? 'Close Election' : 'Open Election'}
                 </button>
-                <button onClick={fetchData} className="btn-primary bg-gray-600 hover:bg-gray-700">
-                  Refresh Data
+                <button
+                  onClick={() => fetch('/api/admin/snapshot', { method: 'POST', headers: { 'x-admin-key': keyRef.current } }).then(() => fetchData())}
+                  className="btn-accent"
+                >
+                  📸 Take Snapshot
                 </button>
               </div>
             </div>
