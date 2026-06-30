@@ -402,6 +402,51 @@ export default function AdminPage() {
     </p>
   </div>
 )}
+        {tab === 'audit' && (
+  <div>
+    <h2 className="text-xl font-bold text-dark mb-2">Audit Log</h2>
+    <p className="text-gray-500 text-sm mb-6">
+      Complete record of authentication attempts and vote submissions. Most recent 200 entries shown.
+    </p>
+    <div className="card overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-gray-200 text-left">
+            <th className="pb-2 font-medium text-gray-500">Time</th>
+            <th className="pb-2 font-medium text-gray-500">Event</th>
+            <th className="pb-2 font-medium text-gray-500">Matric</th>
+            <th className="pb-2 font-medium text-gray-500">IP Address</th>
+            <th className="pb-2 font-medium text-gray-500">Details</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-50">
+          {auditLog.map(entry => (
+            <tr key={entry.id}>
+              <td className="py-2 text-xs text-gray-500 whitespace-nowrap">
+                {new Date(entry.created_at).toLocaleString()}
+              </td>
+              <td className="py-2">
+                <span className={`badge text-xs ${
+                  entry.success
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {entry.event_type}
+                </span>
+              </td>
+              <td className="py-2 font-mono text-xs">{entry.matric_number ?? '—'}</td>
+              <td className="py-2 text-xs text-gray-500">{entry.ip_address ?? '—'}</td>
+              <td className="py-2 text-xs text-gray-600">{entry.details ?? '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {auditLog.length === 0 && (
+        <p className="text-center text-gray-400 py-8">No audit entries yet</p>
+      )}
+    </div>
+  </div>
+)}
         {tab === 'settings' && (
           <div className="card max-w-lg">
             <h2 className="text-xl font-bold text-dark mb-6">Election Settings</h2>
