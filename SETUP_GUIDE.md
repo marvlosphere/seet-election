@@ -26,7 +26,7 @@ Supabase is a free online database. It stores your voters, tokens, and votes.
 
 ## Step 2 — Set Up SMS (Termii)
 
-Termii is a Nigerian SMS provider. This is how tokens get to students.
+Termii is a Nigerian SMS provider . This is how tokens get to students.
 
 1. Go to **https://termii.com** and create an account
 2. Verify your account and top up with some credit (very cheap per SMS)
