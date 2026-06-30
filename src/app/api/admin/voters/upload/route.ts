@@ -6,7 +6,7 @@ import { generateToken, normalizePhone } from '@/lib/utils'
 export async function POST(req: NextRequest) {
   if (!isAdminAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
-    const { csv } = await req.json()
+    const { csv, dept_code } = await req.json()
     if (!csv) return NextResponse.json({ error: 'No CSV provided' }, { status: 400 })
     const lines = csv.trim().split('\n').map((l: string) => l.trim()).filter(Boolean)
     const dataLines = lines[0].toLowerCase().includes('matric') ? lines.slice(1) : lines
@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
         matric_number: matric_number?.toUpperCase(),
         full_name,
         department,
+        dept_code: dept_code ?? null,
         level,
         phone: normalizePhone(phone ?? ''),
         token: generateToken(),
