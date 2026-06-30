@@ -503,6 +503,93 @@ export default function AdminPage() {
     </p>
   </div>
 )}
+        {tab === 'candidates' && (
+          <div>
+            <h2 className="text-xl font-bold text-dark mb-2">Candidate Management</h2>
+            <p className="text-gray-500 text-sm mb-6">
+              Add candidates one at a time. If a position has only one candidate, a &quot;Vote Against&quot; option is created automatically. Adding a second candidate removes it.
+            </p>
+        
+            <div className="card mb-6">
+              <h3 className="font-semibold text-dark mb-4">Add Candidate</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-dark mb-1.5">Full Name</label>
+                  <input className="input" value={candForm.name} onChange={e => setCandForm({ ...candForm, name: e.target.value })} placeholder="e.g. John Doe" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-dark mb-1.5">Position</label>
+                  <input className="input" value={candForm.position} onChange={e => setCandForm({ ...candForm, position: e.target.value })} placeholder="e.g. President" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-dark mb-1.5">Department</label>
+                  <input className="input" value={candForm.department} onChange={e => setCandForm({ ...candForm, department: e.target.value })} placeholder="e.g. Mechanical Engineering" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-dark mb-1.5">Level</label>
+                  <input className="input" value={candForm.level} onChange={e => setCandForm({ ...candForm, level: e.target.value })} placeholder="e.g. 300" />
+                </div>
+              </div>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-dark mb-1.5">Manifesto</label>
+                <textarea className="input h-24" value={candForm.manifesto} onChange={e => setCandForm({ ...candForm, manifesto: e.target.value })} placeholder="Candidate's manifesto..." />
+              </div>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-dark mb-1.5">Photo</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f) }}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:text-sm file:font-semibold hover:file:bg-blue-900"
+                />
+                {candUploading && <p className="text-sm text-gray-400 mt-2">Uploading...</p>}
+                {candForm.photo_url && (
+                  <img src={candForm.photo_url} alt="Preview" className="mt-3 w-24 h-24 object-cover rounded-lg border border-gray-200" />
+                )}
+              </div>
+              {candStatus && <p className="mt-3 text-sm">{candStatus}</p>}
+              <button onClick={handleAddCandidate} disabled={candSubmitting || candUploading} className="btn-primary mt-4">
+                {candSubmitting ? 'Adding...' : 'Add Candidate'}
+              </button>
+            </div>
+        
+            <div className="card">
+              <h3 className="font-semibold text-dark mb-4">Current Ballot ({adminCandidates.filter(c => c.manifesto !== 'AGAINST').length} candidates)</h3>
+              {Array.from(new Set(adminCandidates.map(c => c.position))).map(position => (
+                <div key={position} className="mb-6 last:mb-0">
+                  <p className="font-semibold text-dark text-sm mb-2">{position}</p>
+                  <div className="space-y-2">
+                    {adminCandidates.filter(c => c.position === position).map(c => (
+                      <div key={c.id} className="flex items-center justify-between border border-gray-100 rounded-lg p-3">
+                        <div className="flex items-center gap-3">
+                          {c.photo_url ? (
+                            <img src={c.photo_url} alt={c.name} className="w-10 h-10 rounded-full object-cover" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs">No photo</div>
+                          )}
+                          <div>
+                            <p className="font-medium text-dark text-sm">
+                              {c.manifesto === 'AGAINST' ? `Vote Against ${c.name}` : c.name}
+                            </p>
+                            {c.manifesto !== 'AGAINST' && (
+                              <p className="text-gray-400 text-xs">{c.department} · {c.level} Level</p>
+                            )}
+                          </div>
+                        </div>
+                        {c.manifesto !== 'AGAINST' && (
+                          <button onClick={() => handleDeleteCandidate(c.id, c.name)} className="text-danger text-xs hover:underline">
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {adminCandidates.length === 0 && <p className="text-gray-400 text-sm">No candidates added yet</p>}
+            </div>
+          </div>
+        )}        
         {tab === 'audit' && (
   <div>
     <h2 className="text-xl font-bold text-dark mb-2">Audit Log</h2>
