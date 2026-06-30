@@ -12,7 +12,7 @@ Supabase is a free online database. It stores your voters, tokens, and votes.
 1. Go to **https://supabase.com** and create a free account
 2. Click **New Project** → give it a name like `seet-election`
 3. Choose a strong database password (save it somewhere)
-4. Wait for it to set up (~1 minute)
+4. Wait for it to set up (~1  minute)
 5. Go to **SQL Editor** (left sidebar)
 6. Open the file `database.sql` from this project
 7. Paste it into the SQL editor and  click  **Run**
