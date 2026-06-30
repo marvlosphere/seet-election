@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { POSITIONS, Position } from '@/lib/supabase'
+import { Position } from '@/lib/supabase'
 
 interface ResultRow { candidate_id: string; candidate_name: string; position: Position; vote_count: number }
 interface Voter { id: string; matric_number: string; full_name: string; department: string; dept_code: string; level: string; phone: string; has_voted: boolean; token_used: boolean; token: string }
@@ -206,9 +206,9 @@ export default function AdminPage() {
   const totalVoted = voters.filter(v => v.has_voted).length
   const turnout = totalVoters ? Math.round((totalVoted / totalVoters) * 100) : 0
 
-  const resultsByPosition = POSITIONS.map(position => ({
-    position,
-    candidates: results.filter(r => r.position === position).sort((a, b) => b.vote_count - a.vote_count),
+  const resultsByPosition = positions.map(p => ({
+    position: p.name,
+    candidates: results.filter(r => r.position === p.name).sort((a, b) => b.vote_count - a.vote_count),
   }))
 
   if (!authed) {
