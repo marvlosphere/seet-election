@@ -34,6 +34,7 @@ export default function AdminPage() {
   const [uploadCSV, setUploadCSV] = useState('')
   const [uploadStatus, setUploadStatus] = useState('')
   const [sendingTokens, setSendingTokens] = useState(false)
+  const [sendDeptCode, setSendDeptCode] = useState('')
   const keyRef = useRef('')
 
   async function fetchData() {
@@ -112,7 +113,8 @@ export default function AdminPage() {
 
   async function handleSendTokens() {
     setSendingTokens(true)
-    const res = await fetch('/api/admin/voters/send-tokens', { method: 'POST', headers: { 'x-admin-key': keyRef.current } })
+    const url = sendDeptCode ? `/api/admin/voters/send-tokens?dept_code=${sendDeptCode}` : '/api/admin/voters/send-tokens'
+    const res = await fetch(url, { method: 'POST', headers: { 'x-admin-key': keyRef.current } })    
     const data = await res.json()
     setSendingTokens(false)
     if (res.ok) setUploadStatus(`✅ Tokens sent to ${data.sent} voters via SMS`)
@@ -331,9 +333,17 @@ export default function AdminPage() {
                 value={uploadCSV} onChange={e => setUploadCSV(e.target.value)} />
               <div className="flex gap-3 mt-3">
                 <button onClick={handleUploadVoters} className="btn-primary">Upload & Generate Tokens</button>
-                <button onClick={handleSendTokens} disabled={sendingTokens} className="btn-accent">
-                  {sendingTokens ? 'Sending...' : 'Send Tokens via SMS'}
-                </button>
+                <div className="flex gap-3 mt-3 flex-wrap">
+                  <select className="input w-auto" value={sendDeptCode} onChange={e => setSendDeptCode(e.target.value)}>
+                    <option value="">All departments</option>
+                    {schoolsDepts.map(sd => (
+                      <option key={sd.id} value={sd.dept_code}>{sd.dept_code} — {sd.dept_name}</option>
+                    ))}
+                  </select>
+                  <button onClick={handleSendTokens} disabled={sendingTokens} className="btn-accent">
+                    {sendingTokens ? 'Sending...' : 'Send Tokens via SMS'}
+                  </button>
+                </div>
               </div>
               {uploadStatus && <p className="mt-3 text-sm">{uploadStatus}</p>}
             </div>
