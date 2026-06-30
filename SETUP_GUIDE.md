@@ -1,7 +1,7 @@
 # SEET Election System — Setup & Deployment Guide
 
 ## What You're Setting Up
-A secure online voting system for the School of Engineering & Engineering Technology student elections. Students authenticate with their matric number + a one-time token sent via SMS.
+A secure online voting system for the School of Engineering & Engineering Technology student elections. Students authenticate with their matric number + a one-time token sent via SMS .
 
 ---
 
