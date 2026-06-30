@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { POSITIONS } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,7 +32,8 @@ export async function GET(req: NextRequest) {
     .limit(1)
     .single()
 
-  const expected_votes_per_voter = POSITIONS.length
+  const { data: positionsData } = await db.from('positions').select('id')
+  const expected_votes_per_voter = positionsData?.length ?? 0
   const expected_total_votes = (total_voted ?? 0) * expected_votes_per_voter
   const is_consistent = (total_votes_cast ?? 0) === expected_total_votes
 
