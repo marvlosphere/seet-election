@@ -14,8 +14,9 @@ function getDb() {
 export async function GET(req: NextRequest) {
   const db = getDb()
 
-  const { count: total_voters } = await db.from('voters').select('*', { count: 'exact', head: true })
-  const { count: total_voted } = await db.from('voters').select('*', { count: 'exact', head: true }).eq('has_voted', true)
+  const { data: allVotersData } = await db.from('voters').select('has_voted')
+  const total_voters = allVotersData?.length ?? 0
+  const total_voted = allVotersData?.filter(v => v.has_voted).length ?? 0
   const { data: allVotes } = await db.from('votes').select('id')
   const total_votes_cast = allVotes?.length ?? 0
   const { count: snapshot_count } = await db.from('vote_snapshots').select('*', { count: 'exact', head: true })
