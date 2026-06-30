@@ -20,7 +20,7 @@ export default function IntegrityPage() {
 
   async function fetchIntegrity() {
     try {
-      const res = await fetch(`/api/integrity?t=${Date.now()}`)
+      const res = await fetch(`/api/integrity?t=${Date.now()}`, { cache: 'no-store' })
       if (res.ok) setData(await res.json())
     } catch { /* silent */ }
     setLoading(false)
