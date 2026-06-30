@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   const { data } = await db
     .from('voters')
-    .select('id, matric_number, full_name, department, level, phone, has_voted, token_used, token')
+    .select('id, matric_number, full_name, department, dept_code, level, phone, has_voted, token_used, token')
     .order('full_name')
 
   return NextResponse.json(data ?? [], {
