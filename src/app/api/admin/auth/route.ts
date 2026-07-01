@@ -63,15 +63,38 @@ export async function POST(req: NextRequest) {
     .select('*')
     .eq('matric_number', `ADMIN_${ip}`)
     .single()
-
+  
   if (rateData?.locked_until && new Date(rateData.locked_until) > new Date()) {
     const minutesLeft = Math.ceil((new Date(rateData.locked_until).getTime() - Date.now()) / 60000)
     return NextResponse.json({ error: `Too many failed attempts. Try again in ${minutesLeft} minutes.` }, { status: 429 })
   }
-
+  
+  // Clean up expired and stale sessions BEFORE checking count
+  const staleThreshold = new Date(Date.now() - 3 * 60 * 1000).toISOString()
+  await db.from('admin_sessions')
+    .delete()
+    .or(`expires_at.lt.${new Date().toISOString()},last_active.lt.${staleThreshold}`)
+  
+  // Check active session count BEFORE verifying key
+  const { data: activeSessions } = await db
+    .from('admin_sessions')
+    .select('id, ip_address, created_at')
+  
+  if ((activeSessions?.length ?? 0) >= MAX_ADMIN_SESSIONS) {
+    await db.from('audit_log').insert({
+      event_type: 'ADMIN_SESSION_LIMIT',
+      ip_address: ip,
+      details: `Admin session limit (${MAX_ADMIN_SESSIONS}) reached. Login rejected.`,
+      success: false,
+    })
+    return NextResponse.json({
+      error: `The admin panel is already open on ${MAX_ADMIN_SESSIONS} devices. Please ask an active admin to log out, or wait up to 3 minutes for inactive sessions to clear automatically.`
+    }, { status: 429 })
+  }
+  
   // Verify admin key
   const { key } = await req.json()
-
+  
   if (key !== process.env.ADMIN_KEY) {
     const newAttempts = (rateData?.attempts ?? 0) + 1
     const shouldLock = newAttempts >= 5
@@ -81,14 +104,14 @@ export async function POST(req: NextRequest) {
       locked_until: shouldLock ? new Date(Date.now() + 15 * 60 * 1000).toISOString() : null,
       last_attempt: new Date().toISOString(),
     }, { onConflict: 'matric_number' })
-
+  
     await db.from('audit_log').insert({
       event_type: 'ADMIN_AUTH_FAILED',
       ip_address: ip,
       details: `Invalid admin key. Attempt ${newAttempts} of 5.`,
       success: false,
     })
-
+  
     return NextResponse.json({ error: 'Invalid key' }, { status: 401 })
   }
 
