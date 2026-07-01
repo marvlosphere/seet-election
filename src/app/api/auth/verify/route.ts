@@ -4,6 +4,10 @@ import { v4 as uuidv4 } from 'uuid'
 
 const MAX_ATTEMPTS = 5
 const LOCK_MINUTES = 15
+const MAX_VOTES_PER_IP = 5
+const YOUR_IP_WHITELIST = [
+  '102.89.68.167', // replace with your current IP
+]
 
 function getDb() {
   return createClient(
@@ -47,6 +51,30 @@ export async function POST(req: NextRequest) {
     const { data: settings } = await db.from('election_settings').select('election_open').single()
     if (!settings?.election_open) {
       return NextResponse.json({ error: 'Voting is currently closed. Please check back when the election opens.' }, { status: 403 })
+    }
+
+    // IP vote limit check (skip for whitelisted IPs)
+    if (!YOUR_IP_WHITELIST.includes(ip)) {
+      const { data: ipVotes } = await db
+        .from('audit_log')
+        .select('id')
+        .eq('ip_address', ip)
+        .eq('event_type', 'VOTE_SUBMITTED')
+        .eq('success', true)
+    
+      if ((ipVotes?.length ?? 0) >= MAX_VOTES_PER_IP) {
+        await logEvent(db, {
+          event_type: 'AUTH_BLOCKED_IP',
+          matric_number: matric,
+          ip_address: ip,
+          user_agent: userAgent,
+          details: `IP ${ip} has reached the ${MAX_VOTES_PER_IP} vote submission limit`,
+          success: false,
+        })
+        return NextResponse.json({
+          error: 'Too many votes have been submitted from your network. Please switch to personal mobile data and try again.'
+        }, { status: 429 })
+      }
     }
 
     // ── Rate limiting ────────────────────────────────────────────────────────
