@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [positions, setPositions] = useState<PositionItem[]>([])
   const [newPositionName, setNewPositionName] = useState('')
   const [positionStatus, setPositionStatus] = useState('')
+  const [adminSessions, setAdminSessions] = useState(0)
   const [resetDeptCode, setResetDeptCode] = useState('')
   const [candForm, setCandForm] = useState({ name: '', position: '', department: '', level: '', manifesto: '', photo_url: '' })
   const [candUploading, setCandUploading] = useState(false)
