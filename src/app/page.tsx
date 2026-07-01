@@ -61,9 +61,9 @@ export default function HomePage() {
         
         <Link
           href="/integrity"
-          className="mt-3 text-white/40 hover:text-white/70 text-xs underline underline-offset-2 transition-colors"
+          className="mt-4 inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-sm font-medium px-5 py-2.5 rounded-lg border border-white/20 transition-all"
         >
-          🔍 View Election Integrity Dashboard
+          🔍 Election Integrity Dashboard
         </Link>
       </div>
 
