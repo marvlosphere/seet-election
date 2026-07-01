@@ -102,7 +102,7 @@ export default function VotePage() {
       {/* Top bar */}
       <div className="bg-primary text-white px-6 py-4 flex items-center justify-between">
         <Link href="/" className="text-white/70 hover:text-white text-sm">← Back</Link>
-        <span className="font-semibold text-sm">NIMECHE Student Elections</span>
+        <span className="font-semibold text-sm">FUTABallot</span>
         <span className="text-white/40 text-xs">
           {step === 'auth' ? 'Step 1 of 3' : step === 'ballot' ? 'Step 2 of 3' : step === 'confirm' ? 'Step 3 of 3' : '✓'}
         </span>
@@ -309,7 +309,7 @@ export default function VotePage() {
               Thank you, <strong>{voterSession?.full_name}</strong>.
             </p>
             <p className="text-gray-500 text-sm mb-8">
-              Your vote has been recorded securely. Results will be announced by the faculty after the election closes.
+              Your vote has been recorded securely. Results will be announced after the election closes.
             </p>
             <div className="bg-gray-50 rounded-xl p-4 text-left text-sm text-gray-600">
               <p className="font-medium text-dark mb-2">Important reminder</p>
