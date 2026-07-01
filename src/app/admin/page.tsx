@@ -36,6 +36,7 @@ export default function AdminPage() {
   const [sendingTokens, setSendingTokens] = useState(false)
   const [sendDeptCode, setSendDeptCode] = useState('')
   const keyRef = useRef('')
+  const sessionTokenRef = useRef('')
 
   async function fetchData() {
     const k = keyRef.current
@@ -82,7 +83,9 @@ export default function AdminPage() {
     })
     setLoading(false)
     if (res.ok) {
+      const data = await res.json()
       keyRef.current = adminKey
+      sessionTokenRef.current = data.session_token
       setAuthed(true)
       setAuthError('')
     } else setAuthError('Invalid admin key.')
@@ -254,7 +257,18 @@ export default function AdminPage() {
           <span className={`badge ${electionOpen ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
             {electionOpen ? '🟢 Election Open' : '🔴 Election Closed'}
           </span>
-          <button onClick={() => { setAuthed(false); keyRef.current = '' }} className="text-white/50 hover:text-white text-sm">Logout</button>
+          <button onClick={async () => {
+            if (sessionTokenRef.current) {
+              await fetch('/api/admin/auth', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_token: sessionTokenRef.current }),
+              })
+            }
+            setAuthed(false)
+            keyRef.current = ''
+            sessionTokenRef.current = ''
+          }} className="text-white/50 hover:text-white text-sm">Logout</button>
         </div>
       </div>
 
