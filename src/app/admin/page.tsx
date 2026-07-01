@@ -22,6 +22,7 @@ export default function AdminPage() {
   const [positions, setPositions] = useState<PositionItem[]>([])
   const [newPositionName, setNewPositionName] = useState('')
   const [positionStatus, setPositionStatus] = useState('')
+  const [adminSessions, setAdminSessions] = useState(0)
   const [candForm, setCandForm] = useState({ name: '', position: '', department: '', level: '', manifesto: '', photo_url: '' })
   const [candUploading, setCandUploading] = useState(false)
   const [candSubmitting, setCandSubmitting] = useState(false)
@@ -731,6 +732,15 @@ export default function AdminPage() {
                 <div>
                   <p className="font-semibold text-dark">Election Status</p>
                   <p className="text-gray-500 text-sm">Allow students to vote</p>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div>
+                    <p className="font-semibold text-dark">Active Admin Sessions</p>
+                    <p className="text-gray-500 text-sm">Devices currently logged into the admin panel</p>
+                  </div>
+                  <span className="badge bg-primary text-white text-sm px-3 py-1.5">
+                    {adminSessions} / 3
+                  </span>
                 </div>
                 <button onClick={toggleElection}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${electionOpen ? 'bg-success' : 'bg-gray-300'}`}>
