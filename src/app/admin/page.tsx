@@ -45,7 +45,7 @@ export default function AdminPage() {
     try {
       const h = { 'x-admin-key': k }
       const t = Date.now()
-      const [r, v, st, a, sd, c, p] = await Promise.all([
+      const [r, v, st, a, sd, c, p, ses] = await Promise.all([
         fetch(`/api/admin/results?t=${t}`, { headers: h }),
         fetch(`/api/admin/voters?t=${t}`, { headers: h }),
         fetch(`/api/admin/settings?t=${t}`, { headers: h }),
@@ -53,6 +53,7 @@ export default function AdminPage() {
         fetch(`/api/admin/schools-departments?t=${t}`, { headers: h }),
         fetch(`/api/admin/candidates?t=${t}`, { headers: h }),
         fetch(`/api/admin/positions?t=${t}`, { headers: h }),
+        fetch(`/api/admin/sessions?t=${t}`, { headers: h }),
       ])
       if (r.ok) setResults(await r.json())
       if (v.ok) setVoters(await v.json())
@@ -61,6 +62,7 @@ export default function AdminPage() {
       if (sd.ok) setSchoolsDepts(await sd.json())
       if (c.ok) setAdminCandidates(await c.json())
       if (p.ok) setPositions(await p.json())
+      if (ses.ok) { const s = await ses.json(); setAdminSessions(s.count) }
     } catch { /* silent */ }
   }
 
