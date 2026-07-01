@@ -53,6 +53,53 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Voting is currently closed. Please check back when the election opens.' }, { status: 403 })
     }
 
+    // Country and VPN check (skip for whitelisted IPs)
+    if (!YOUR_IP_WHITELIST.includes(ip) && ip !== 'unknown') {
+      try {
+        const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,countryCode,proxy,hosting`)
+        const geoData = await geoRes.json()
+    
+        if (geoData.status === 'success') {
+          if (geoData.countryCode !== 'NG') {
+            await logEvent(db, {
+              event_type: 'AUTH_BLOCKED_GEO',
+              matric_number: matric,
+              ip_address: ip,
+              user_agent: userAgent,
+              details: `Access blocked from ${geoData.country} (${geoData.countryCode})`,
+              success: false,
+            })
+            return NextResponse.json({
+              error: 'Access to this election is only permitted from Nigeria. If you are in Nigeria, please switch to mobile data and try again.'
+            }, { status: 403 })
+          }
+    
+          if (geoData.proxy === true || geoData.hosting === true) {
+            await logEvent(db, {
+              event_type: 'AUTH_BLOCKED_VPN',
+              matric_number: matric,
+              ip_address: ip,
+              user_agent: userAgent,
+              details: `VPN or proxy detected from ${geoData.country}`,
+              success: false,
+            })
+            return NextResponse.json({
+              error: 'VPN and proxy connections are not permitted. Please disconnect your VPN and use your personal mobile data or a trusted network.'
+            }, { status: 403 })
+          }
+        }
+      } catch {
+        // If geo check fails, allow through rather than blocking legitimate voters
+        // Log it but don't block
+        await logEvent(db, {
+          event_type: 'GEO_CHECK_FAILED',
+          matric_number: matric,
+          ip_address: ip,
+          details: 'ip-api.com check failed, allowing through',
+          success: true,
+        })
+      }
+    }
     // IP vote limit check (skip for whitelisted IPs)
     if (!YOUR_IP_WHITELIST.includes(ip)) {
       const { data: ipVotes } = await db
