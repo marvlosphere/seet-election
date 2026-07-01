@@ -115,14 +115,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid key' }, { status: 401 })
   }
 
-  // Clean up expired sessions
-  await db.from('admin_sessions').delete().lt('expires_at', new Date().toISOString())
-
-  // Check active session count
-  const { data: activeSessions } = await db
-    .from('admin_sessions')
-    .select('id, ip_address, created_at')
-
   if ((activeSessions?.length ?? 0) >= MAX_ADMIN_SESSIONS) {
     await db.from('audit_log').insert({
       event_type: 'ADMIN_SESSION_LIMIT',
