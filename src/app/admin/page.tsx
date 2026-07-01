@@ -22,7 +22,7 @@ export default function AdminPage() {
   const [positions, setPositions] = useState<PositionItem[]>([])
   const [newPositionName, setNewPositionName] = useState('')
   const [positionStatus, setPositionStatus] = useState('')
-  const [adminSessions, setAdminSessions] = useState(0)
+  const [resetDeptCode, setResetDeptCode] = useState('')
   const [candForm, setCandForm] = useState({ name: '', position: '', department: '', level: '', manifesto: '', photo_url: '' })
   const [candUploading, setCandUploading] = useState(false)
   const [candSubmitting, setCandSubmitting] = useState(false)
@@ -332,18 +332,34 @@ export default function AdminPage() {
                 >
                   📸 Take Snapshot
                 </button>
-                <button
-                  onClick={async () => {
-                    if (!confirm('This will permanently delete ALL voters, votes, sessions and snapshots. This cannot be undone. Are you sure?')) return
-                    if (!confirm('Second confirmation: delete everything and reset for the next election?')) return
-                    const res = await fetch('/api/admin/reset', { method: 'POST', headers: { 'x-admin-key': keyRef.current } })
-                    if (res.ok) { alert('Election data cleared successfully.'); fetchData() }
-                    else { const d = await res.json(); alert(`Error: ${d.error}`) }
-                  }}
-                  className="btn-danger"
-                >
-                  🗑️ Reset Election Data
-                </button>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <select
+                    className="input w-auto text-sm"
+                    value={resetDeptCode}
+                    onChange={e => setResetDeptCode(e.target.value)}
+                  >
+                    <option value="">All departments</option>
+                    {schoolsDepts.map(sd => (
+                      <option key={sd.id} value={sd.dept_code}>{sd.dept_code} — {sd.dept_name}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={async () => {
+                      const scope = resetDeptCode ? `department ${resetDeptCode}` : 'ALL departments'
+                      if (!confirm(`This will permanently delete voters and votes for ${scope}. This cannot be undone. Are you sure?`)) return
+                      if (!confirm(`Second confirmation: delete all voter data for ${scope}?`)) return
+                      const res = await fetch(`/api/admin/reset${resetDeptCode ? `?dept_code=${resetDeptCode}` : ''}`, {
+                        method: 'POST',
+                        headers: { 'x-admin-key': keyRef.current }
+                      })
+                      if (res.ok) { alert('Election data cleared successfully.'); fetchData() }
+                      else { const d = await res.json(); alert(`Error: ${d.error}`) }
+                    }}
+                    className="btn-danger"
+                  >
+                    🗑️ Reset Election Data
+                  </button>
+                </div>
               </div>
             </div>
           </div>
