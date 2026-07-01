@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   if (!isAdminAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const db = getDb()
-  const staleThreshold = new Date(Date.now() - 30 * 60 * 1000).toISOString()
+  const staleThreshold = new Date(Date.now() - 3 * 60 * 1000).toISOString()
   await db.from('admin_sessions')
     .delete()
     .or(`expires_at.lt.${new Date().toISOString()},last_active.lt.${staleThreshold}`)
