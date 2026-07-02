@@ -12,6 +12,10 @@ export async function POST(req: NextRequest) {
     if (new Date(session.expires_at) < new Date()) return NextResponse.json({ error: 'Your session has expired. Please start again.' }, { status: 401 })
     const { data: voter } = await db.from('voters').select('has_voted').eq('id', voter_id).single()
     if (voter?.has_voted) return NextResponse.json({ error: 'You have already voted.' }, { status: 403 })
+    const { data: settings } = await db.from('election_settings').select('election_open').single()
+    if (!settings?.election_open) {
+      return NextResponse.json({ error: 'Voting has closed. Your vote could not be submitted.' }, { status: 403 })
+    }
     const { data: positionsData } = await db.from('positions').select('name')
     const currentPositions = (positionsData ?? []).map(p => p.name)
     const votedPositions = votes.map((v: { position: string }) => v.position)
