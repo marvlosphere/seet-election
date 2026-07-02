@@ -25,3 +25,21 @@ export async function GET(req: NextRequest) {
     }
   })
 }
+
+export async function DELETE(req: NextRequest) {
+  if (!isAdminAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const db = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      global: {
+        fetch: (url, options = {}) => fetch(url, { ...options, cache: 'no-store' }),
+      },
+    }
+  )
+
+  await db.from('audit_log').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+
+  return NextResponse.json({ success: true })
+}
