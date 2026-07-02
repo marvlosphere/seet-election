@@ -278,14 +278,14 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-light">
-      <div className="bg-primary text-white px-6 py-4 flex items-center justify-between">
+      <div className="bg-primary text-white px-4 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="font-bold">FUTABallot Admin</p>
+          <p className="font-bold text-sm sm:text-base">FUTABallot Admin</p>
           <p className="text-white/60 text-xs">Electoral Committee Dashboard</p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className={`badge ${electionOpen ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-            {electionOpen ? '🟢 Election Open' : '🔴 Election Closed'}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <span className={`badge text-xs sm:text-sm ${electionOpen ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+            {electionOpen ? '🟢 Open' : '🔴 Closed'}
           </span>
           <button onClick={async () => {
             if (sessionTokenRef.current) {
@@ -302,11 +302,11 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="bg-white border-b border-gray-200 px-6">
-        <div className="flex gap-1">
+      <div className="bg-white border-b border-gray-200 px-2 sm:px-6 overflow-x-auto">
+        <div className="flex gap-1 min-w-max">
           {(['dashboard', 'voters', 'candidates', 'results', 'whatsapp', 'audit', 'settings'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`px-4 py-3 text-sm font-medium capitalize border-b-2 transition-colors ${tab === t ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-dark'}`}>
+              className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium capitalize border-b-2 transition-colors whitespace-nowrap ${tab === t ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-dark'}`}>
               {t}
             </button>
           ))}
