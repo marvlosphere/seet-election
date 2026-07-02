@@ -57,3 +57,12 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ success: true, snapshotted: snapshotRows.length })
 }
+
+export async function DELETE(req: NextRequest) {
+  if (!isAdminAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const db = getDb()
+  await db.from('vote_snapshots').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+
+  return NextResponse.json({ success: true })
+}
