@@ -49,7 +49,7 @@ export default function AdminPage() {
     try {
       const h = { 'x-admin-key': k }
       const t = Date.now()
-      const [r, v, st, a, sd, c, p, ses] = await Promise.all([
+      const [r, v, st, a, sd, c, p, ses, snap] = await Promise.all([
         fetch(`/api/admin/results?t=${t}`, { headers: h }),
         fetch(`/api/admin/voters?t=${t}`, { headers: h }),
         fetch(`/api/admin/settings?t=${t}`, { headers: h }),
