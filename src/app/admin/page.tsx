@@ -274,15 +274,39 @@ export default function AdminPage() {
         y += 8
       } else {
         const total = candidates.reduce((sum, c) => sum + c.vote_count, 0)
-        candidates.forEach((c, i) => {
-          const pct = total > 0 ? Math.round((c.vote_count / total) * 100) : 0
+        const isUncontested = candidates.length === 2 && candidates[0].candidate_name === candidates[1].candidate_name
+      
+        if (isUncontested) {
+          // For/Against display for unopposed candidates
+          const sorted = [...candidates].sort((a, b) => b.vote_count - a.vote_count)
+          const forEntry = candidates[0] // first one inserted is always "For"
+          const againstEntry = candidates.find(c => c !== forEntry) ?? candidates[1]
+          const net = forEntry.vote_count - againstEntry.vote_count
+      
           doc.setFontSize(10)
-          doc.setFont('helvetica', i === 0 ? 'bold' : 'normal')
-          const label = i === 0 ? `★ ${c.candidate_name}` : c.candidate_name
-          doc.text(`${label}  —  ${c.vote_count} votes (${pct}%)`, 20, y)
+          doc.setFont('helvetica', 'bold')
+          doc.text(`${forEntry.candidate_name}  (Unopposed)`, 20, y)
           y += 6
-        })
-        y += 4
+          doc.setFont('helvetica', 'normal')
+          doc.text(`  For:      ${forEntry.vote_count} votes`, 20, y)
+          y += 5
+          doc.text(`  Against:  ${againstEntry.vote_count} votes`, 20, y)
+          y += 5
+          doc.setFont('helvetica', 'bold')
+          doc.text(`  Net Result: ${net > 0 ? '+' : ''}${net}  (${net > 0 ? 'PASSED' : 'REJECTED'})`, 20, y)
+          y += 8
+        } else {
+          // Normal contested display
+          candidates.forEach((c, i) => {
+            const pct = total > 0 ? Math.round((c.vote_count / total) * 100) : 0
+            doc.setFontSize(10)
+            doc.setFont('helvetica', i === 0 ? 'bold' : 'normal')
+            const prefix = i === 0 ? '[WINNER] ' : ''
+            doc.text(`${prefix}${c.candidate_name}  —  ${c.vote_count} votes (${pct}%)`, 20, y)
+            y += 6
+          })
+          y += 4
+        }
       }
     })
   
