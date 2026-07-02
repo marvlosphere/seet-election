@@ -842,9 +842,21 @@ export default function AdminPage() {
           </div>
         )}        
         {tab === 'audit' && (
-  <div>
-    <h2 className="text-xl font-bold text-dark mb-2">Audit Log</h2>
-    <p className="text-gray-500 text-sm mb-6">
+          <div>
+            <div className="flex items-center justify-between mb-2 flex-wrap gap-3">
+              <h2 className="text-xl font-bold text-dark">Audit Log</h2>
+              <button
+                onClick={async () => {
+                  if (!confirm('Delete all audit log entries? This cannot be undone.')) return
+                  const res = await fetch('/api/admin/audit-log', { method: 'DELETE', headers: { 'x-admin-key': keyRef.current } })
+                  if (res.ok) { alert('Audit log cleared.'); fetchData() }
+                }}
+                className="btn-danger text-sm"
+              >
+                🗑️ Clear Audit Log
+              </button>
+            </div>
+            <p className="text-gray-500 text-sm mb-6">
       Complete record of authentication attempts and vote submissions. Most recent 200 entries shown.
     </p>
     <div className="card overflow-x-auto">
