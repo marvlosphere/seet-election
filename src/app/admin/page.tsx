@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Position } from '@/lib/supabase'
+import jsPDF from 'jspdf'
 
 interface ResultRow { candidate_id: string; candidate_name: string; position: Position; vote_count: number }
 interface Voter { id: string; matric_number: string; full_name: string; department: string; dept_code: string; level: string; phone: string; has_voted: boolean; token_used: boolean; token: string }
@@ -237,6 +238,57 @@ export default function AdminPage() {
     if (res.ok) fetchData()
     else alert(data.error)
   }
+  function handleExportResultsPDF() {
+    const doc = new jsPDF()
+    const pageWidth = doc.internal.pageSize.getWidth()
+    let y = 20
+  
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text('FUTABallot — Election Results', pageWidth / 2, y, { align: 'center' })
+    y += 8
+  
+    doc.setFontSize(10)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, y, { align: 'center' })
+    y += 6
+    doc.text(`Total Registered Voters: ${totalVoters}  |  Total Voted: ${totalVoted}  |  Turnout: ${turnout}%`, pageWidth / 2, y, { align: 'center' })
+    y += 12
+  
+    doc.setLineWidth(0.5)
+    doc.line(15, y, pageWidth - 15, y)
+    y += 10
+  
+    resultsByPosition.forEach(({ position, candidates }) => {
+      if (y > 260) { doc.addPage(); y = 20 }
+  
+      doc.setFontSize(13)
+      doc.setFont('helvetica', 'bold')
+      doc.text(position, 15, y)
+      y += 7
+  
+      if (candidates.length === 0) {
+        doc.setFontSize(10)
+        doc.setFont('helvetica', 'italic')
+        doc.text('No votes recorded', 20, y)
+        y += 8
+      } else {
+        const total = candidates.reduce((sum, c) => sum + c.vote_count, 0)
+        candidates.forEach((c, i) => {
+          const pct = total > 0 ? Math.round((c.vote_count / total) * 100) : 0
+          doc.setFontSize(10)
+          doc.setFont('helvetica', i === 0 ? 'bold' : 'normal')
+          const label = i === 0 ? `★ ${c.candidate_name}` : c.candidate_name
+          doc.text(`${label}  —  ${c.vote_count} votes (${pct}%)`, 20, y)
+          y += 6
+        })
+        y += 4
+      }
+    })
+  
+    doc.save(`FUTABallot_Results_${new Date().toISOString().split('T')[0]}.pdf`)
+  }
+  
   const totalVoters = voters.length
   const totalVoted = voters.filter(v => v.has_voted).length
   const turnout = totalVoters ? Math.round((totalVoted / totalVoters) * 100) : 0
@@ -491,7 +543,12 @@ export default function AdminPage() {
 
         {tab === 'results' && (
           <div>
-            <h2 className="text-xl font-bold text-dark mb-6">Live Results</h2>
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+              <h2 className="text-xl font-bold text-dark">Live Results</h2>
+              <button onClick={handleExportResultsPDF} className="btn-primary bg-gray-700 hover:bg-gray-800 text-sm">
+                📄 Export PDF
+              </button>
+            </div>
             <div className="space-y-4">
               {positions.map(p => {
                 const position = p.name
