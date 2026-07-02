@@ -39,6 +39,22 @@ export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown'
   const userAgent = req.headers.get('user-agent') ?? 'unknown'
 
+  // Global request throttle — max 10 requests per IP per 60 seconds, regardless of outcome
+  if (ip !== 'unknown') {
+    const throttleWindow = new Date(Date.now() - 60 * 1000).toISOString()
+    const { count: recentRequests } = await db
+      .from('audit_log')
+      .select('*', { count: 'exact', head: true })
+      .eq('ip_address', ip)
+      .gte('created_at', throttleWindow)
+  
+    if ((recentRequests ?? 0) >= 10) {
+      return NextResponse.json({
+        error: 'Too many requests. Please wait a moment and try again.'
+      }, { status: 429 })
+    }
+  }
+
   try {
     const { matric_number, token } = await req.json()
 
