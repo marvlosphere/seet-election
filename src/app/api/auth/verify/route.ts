@@ -6,7 +6,7 @@ const MAX_ATTEMPTS = 5
 const LOCK_MINUTES = 15
 const MAX_VOTES_PER_IP = 5
 const YOUR_IP_WHITELIST = [
-  '105.119.30.83', // replace with your current IP
+  '102.89.68.22', // replace with your current IP
 ]
 
 function getDb() {
