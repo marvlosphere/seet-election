@@ -102,24 +102,24 @@ export async function POST(req: NextRequest) {
     }
     // IP vote limit check (skip for whitelisted IPs)
     if (!YOUR_IP_WHITELIST.includes(ip)) {
-      const { data: ipVotes } = await db
+      const { data: ipAuths } = await db
         .from('audit_log')
         .select('id')
         .eq('ip_address', ip)
-        .eq('event_type', 'VOTE_SUBMITTED')
+        .eq('event_type', 'AUTH_SUCCESS')
         .eq('success', true)
     
-      if ((ipVotes?.length ?? 0) >= MAX_VOTES_PER_IP) {
+      if ((ipAuths?.length ?? 0) >= MAX_VOTES_PER_IP) {
         await logEvent(db, {
           event_type: 'AUTH_BLOCKED_IP',
           matric_number: matric,
           ip_address: ip,
           user_agent: userAgent,
-          details: `IP ${ip} has reached the ${MAX_VOTES_PER_IP} vote submission limit`,
+          details: `IP ${ip} has reached the ${MAX_VOTES_PER_IP} authentication limit`,
           success: false,
         })
         return NextResponse.json({
-          error: 'Too many votes have been submitted from your network. Please switch to personal mobile data and try again.'
+          error: 'Too many students have logged in from your network. Please switch to personal mobile data and try again.'
         }, { status: 429 })
       }
     }
