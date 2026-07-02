@@ -1,9 +1,20 @@
 import Link from 'next/link'
 
-export default function HomePage() {
+async function getPositions(): Promise<string[]> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? ''}/api/positions`, { cache: 'no-store' })
+    if (!res.ok) return []
+    return await res.json()
+  } catch {
+    return []
+  }
+}
+
+export default async function HomePage() {
+  const positions = await getPositions()
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-primary via-blue-800 to-dark flex flex-col">
-      {/* Header */}
       <header className="px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img
@@ -21,7 +32,6 @@ export default function HomePage() {
         </Link>
       </header>
 
-      {/* Hero */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
         <div className="mb-4">
           <img
@@ -54,11 +64,11 @@ export default function HomePage() {
         >
           Vote Now
         </Link>
-        
+
         <p className="mt-6 text-white/40 text-sm">
           Token sent via SMS at registration
         </p>
-        
+
         <Link
           href="/integrity"
           className="mt-4 inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-sm font-medium px-5 py-2.5 rounded-lg border border-white/20 transition-all"
@@ -67,22 +77,18 @@ export default function HomePage() {
         </Link>
       </div>
 
-      {/* Positions preview */}
-      <div className="px-6 pb-12">
-        <p className="text-center text-white/40 text-xs uppercase tracking-widest mb-4">Positions on the ballot</p>
-        <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
-          {[
-            'President', 'Vice President', 'General Secretary',
-            'Asst. General Secretary', 'Financial Secretary',
-            'PRO I', 'PRO II', 'Treasurer',
-            'Welfare Director', 'Sports Director', 'Social Director'
-          ].map(pos => (
-            <span key={pos} className="badge bg-white/10 text-white/70 border border-white/10 px-3 py-1 text-xs">
-              {pos}
-            </span>
-          ))}
+      {positions.length > 0 && (
+        <div className="px-6 pb-12">
+          <p className="text-center text-white/40 text-xs uppercase tracking-widest mb-4">Positions on the ballot</p>
+          <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+            {positions.map(pos => (
+              <span key={pos} className="badge bg-white/10 text-white/70 border border-white/10 px-3 py-1 text-xs">
+                {pos}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </main>
   )
 }
