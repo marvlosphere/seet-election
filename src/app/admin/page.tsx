@@ -140,6 +140,15 @@ export default function AdminPage() {
     else setUploadStatus(`❌ ${data.error}`)
   }
   async function handlePhotoUpload(file: File) {
+    const MAX_SIZE_MB = 2
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      setCandStatus(`❌ Photo is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Please use an image under ${MAX_SIZE_MB}MB.`)
+      return
+    }
+    if (!file.type.startsWith('image/')) {
+      setCandStatus('❌ Please select an image file (JPG, PNG, etc.)')
+      return
+    }
     setCandUploading(true)
     try {
       const formData = new FormData()
